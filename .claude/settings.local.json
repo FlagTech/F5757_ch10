@@ -1,0 +1,19 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git reset:*)",
+      "Bash(git diff:*)",
+      "Bash(git config:*)",
+      "Bash(git rm:*)",
+      "Bash(git push:*)",
+      "Bash(git stash pop)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
