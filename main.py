@@ -1,262 +1,160 @@
-"""
-TaskMaster - 全部寫在一個檔案裡（糟糕的做法）
-main.py 應當只做為一個門戶入口，呼叫其他的工能
 
 """
-import tkinter as tk
-from tkinter import messagebox,ttk
-import sqlite3
-import datetime
-import json
-from flask import Flask,request,jsonify
-import threading
-import requests
+TaskMaster 主程式入口點
+提供統一的命令行介面來啟動不同的應用模式
+"""
+
+import sys
 import os
+from database import DatabaseManager
+from task_gui import TaskGUI
+from api_server import run_web_server
 
-# Global variables everywhere (BAD!)
-db_connection = None
-app = Flask(__name__)
-window = None
-current_user = "admin"
-DEBUG_MODE = True
-API_KEY = "sk-1234567890abcdef"  # Hardcoded API key (VERY BAD!)
 
-def connect_db():
-    global db_connection
+def run_gui():
+    """啟動桌面GUI介面"""
     try:
-        db_connection = sqlite3.connect('tasks.db')
-        db_connection.execute('''CREATE TABLE IF NOT EXISTS tasks 
-                                (id INTEGER PRIMARY KEY, title TEXT, description TEXT, 
-                                priority TEXT, status TEXT, created_at TEXT)''')
-        db_connection.commit()
-    except:
-        print("Database error!")  # Poor error handling
-
-class Task:
-    def __init__(self,title,desc,priority="low"):  # Inconsistent naming
-        self.title=title  # No spaces around operators
-        self.desc= desc   # Inconsistent spacing
-        self.priority =priority
-        self.status="pending"
-        self.created_at=str(datetime.datetime.now())  # String instead of datetime
-
-def add_task(title,description,priority="low"):
-    try:
-        conn = sqlite3.connect('tasks.db')
-        conn.execute("INSERT INTO tasks (title,description,priority,status,created_at) VALUES (?,?,?,?,?)",
-                    (title, description, priority, "pending", str(datetime.datetime.now())))
-        conn.commit()
-        conn.close()
-        return True
+        
+        gui = TaskGUI()
+        gui.run()
+    except ImportError as e:
+        print(f"❌ 無法啟動GUI介面: {e}")
+        print("請確認 task_gui.py 模組存在且正確")
+        sys.exit(1)
     except Exception as e:
-        print(f"Error: {e}")
-        return False
+        print(f"❌ GUI啟動失敗: {e}")
+        sys.exit(1)
 
-def get_tasks():
-    # 每次建立新連線
-    conn = sqlite3.connect('tasks.db')
-    cursor = conn.execute("SELECT * FROM tasks")
-    tasks = cursor.fetchall()
-    conn.close()
-    return tasks
 
-def update_task(task_id, status):
-    conn = sqlite3.connect('tasks.db')
-    # 同時修復 SQL 注入問題
-    conn.execute("UPDATE tasks SET status=? WHERE id=?", (status, task_id))
-    conn.commit()
-    conn.close()
+def run_web():
+    """啟動Web介面"""
+    try:
+        
+        run_web_server()
+    except ImportError as e:
+        print(f"❌ 無法啟動Web服務: {e}")
+        print("請確認 api_server.py 模組存在且正確")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Web服務啟動失敗: {e}")
+        sys.exit(1)
 
-def delete_task(task_id):
-    conn = sqlite3.connect('tasks.db')
-    # 修復 SQL 注入問題
-    conn.execute("DELETE FROM tasks WHERE id=?", (task_id,))
-    conn.commit()
-    conn.close()
 
-# GUI Code mixed with business logic
-class TaskGUI:
-    def __init__(self):
-        self.window = tk.Tk()
-        self.window.title("TaskMaster")
-        self.window.geometry("800x600")
-        
-        # Create widgets without proper organization
-        self.task_listbox = tk.Listbox(self.window, width=80, height=20)
-        self.task_listbox.pack(pady=10)
-        
-        self.title_entry = tk.Entry(self.window, width=50)
-        self.title_entry.pack()
-        
-        self.desc_entry = tk.Text(self.window, width=50, height=5)
-        self.desc_entry.pack()
-        
-        self.add_button = tk.Button(self.window, text="Add Task", command=self.add_task_gui)
-        self.add_button.pack()
-        
-        self.complete_button = tk.Button(self.window, text="Mark Complete", command=self.complete_task)
-        self.complete_button.pack()
-        
-        self.delete_button = tk.Button(self.window, text="Delete", command=self.delete_task_gui)
-        self.delete_button.pack()
-        
-        self.refresh_tasks()
-    
-    def add_task_gui(self):
-        title = self.title_entry.get()
-        desc = self.desc_entry.get("1.0", tk.END).strip()
-        
-        if add_task(title, desc):
-            self.title_entry.delete(0, tk.END)
-            self.desc_entry.delete("1.0", tk.END)
-            self.refresh_tasks()
-        else:
-            messagebox.showerror("Error", "Failed to add task")
-    
-    def complete_task(self):
-        selection = self.task_listbox.curselection()
-        if selection:
-            task_id = self.get_task_id_from_selection(selection[0])
-            update_task(task_id, "completed")
-            self.refresh_tasks()
-    
-    def delete_task_gui(self):
-        selection = self.task_listbox.curselection()
-        if selection:
-            task_id = self.get_task_id_from_selection(selection[0])
-            delete_task(task_id)
-            self.refresh_tasks()
-    
-    def get_task_id_from_selection(self, index):
-        # Fragile way to get task ID
-        task_text = self.task_listbox.get(index)
-        return int(task_text.split(" - ")[0])
-    
-    def refresh_tasks(self):
-        self.task_listbox.delete(0, tk.END)
-        tasks = get_tasks()
-        for task in tasks:
-            task_text = f"{task[0]} - {task[1]} ({task[3]})"
-            self.task_listbox.insert(tk.END, task_text)
-    
-    def run(self):
-        self.window.mainloop()
+def run_backup():
+    """執行資料庫備份"""
+    try:
+        backup_database()
+    except ImportError:
+        # 如果 backup_main 不存在，使用簡單的備份方式
+        import shutil
+        try:
+            shutil.copy('tasks.db', 'backup_tasks.db')
+            print("✅ 資料庫備份完成: backup_tasks.db")
+        except Exception as e:
+            print(f"❌ 備份失敗: {e}")
+    except Exception as e:
+        print(f"❌ 備份失敗: {e}")
 
-# Flask API mixed in the same file
-@app.route('/api/tasks', methods=['GET'])
-def api_get_tasks():
-    tasks = get_tasks()
-    # Poor JSON response structure
-    return jsonify(tasks)
 
-@app.route('/api/tasks', methods=['POST'])
-def api_create_task():
-    data = request.json  # # 沒有驗證 json 是否存在
-    title = data['title']  # KeyError 風險
-    desc = data.get('description', '')
-    priority = data.get('priority', 'low')
-    
-    if add_task(title, desc, priority):
-        return "OK"
+def run_database_check():
+    """執行資料庫檢查"""
+    try:
+        # 延遲匯入避免 check_db 模組的 sys.stdout 設定影響其他模式
+        from check_db import main as check_db_main
+        check_db_main()
+    except ImportError as e:
+        print(f"❌ 無法執行資料庫檢查: {e}")
+        print("請確認 check_db.py 模組存在且正確")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ 資料庫檢查失敗: {e}")
+        sys.exit(1)
+
+
+def show_help():
+    """顯示使用說明"""
+    print("""
+TaskMaster - 任務管理系統
+
+用法: python main.py <模式>
+
+可用模式:
+  gui       啟動桌面GUI介面
+  api/web   啟動Web API服務 (瀏覽器訪問 http://127.0.0.1:5000)
+  backup    執行資料庫備份
+  check     執行資料庫檢查
+  help      顯示此說明
+
+範例:
+  python main.py gui      # 啟動桌面應用
+  python main.py api      # 啟動Web API服務
+  python main.py backup   # 備份資料庫
+  python main.py check    # 檢查資料庫狀態
+
+系統需求:
+  - Python 3.11+
+  - Flask (Web模式)
+  - tkinter (GUI模式，通常內建)
+
+更多資訊請查看 README.md
+    """)
+
+
+def initialize_database():
+    """初始化資料庫（如果需要）"""
+    try:
+        
+        db_manager = DatabaseManager()
+        db_manager.initialize()
+    except ImportError:
+        # 如果 database 模組不存在，使用簡單的初始化
+        import sqlite3
+        try:
+            conn = sqlite3.connect('tasks.db')
+            conn.execute('''CREATE TABLE IF NOT EXISTS tasks
+                           (id INTEGER PRIMARY KEY, title TEXT, description TEXT,
+                            priority TEXT, status TEXT, created_at TEXT)''')
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️  資料庫初始化警告: {e}")
+    except Exception as e:
+        print(f"⚠️  資料庫初始化警告: {e}")
+
+
+def main():
+    """主程式入口"""
+    # 初始化資料庫
+    initialize_database()
+
+    # 解析命令行參數
+    if len(sys.argv) < 2:
+        print("❌ 請指定執行模式")
+        show_help()
+        sys.exit(1)
+
+    mode = sys.argv[1].lower()
+
+    # 路由到對應的功能
+    if mode == "gui":
+        print("🖥️  啟動桌面GUI介面...")
+        run_gui()
+    elif mode in ["web", "api"]:
+        print("🌐 啟動Web API服務...")
+        run_web()
+    elif mode == "backup":
+        print("💾 執行資料庫備份...")
+        run_backup()
+    elif mode == "check":
+        print("🔍 執行資料庫檢查...")
+        run_database_check()
+    elif mode in ["help", "-h", "--help"]:
+        show_help()
     else:
-        return "ERROR", 500
-
-@app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
-def api_delete_task(task_id):
-    delete_task(task_id)
-    return "DELETED" 
-
-@app.get("/")
-def api_docs():
-    # 極簡 API 介面（純 HTML + 一點 JS）
-    return """
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>TaskMaster API</title></head>
-<body>
-  <h1>TaskMaster API (超級陽春介面)</h1>
-  <p>
-    <a href="/api/tasks" target="_blank">GET /api/tasks</a><br>
-    POST /api/tasks（下方表單）<br>
-    DELETE /api/tasks/&lt;id&gt;（自行用 curl/工具測）
-  </p>
-
-  <hr>
-  <h2>POST /api/tasks</h2>
-  <form id="taskForm">
-    <label>title: <input name="title" required></label><br>
-    <label>description: <input name="description"></label><br>
-    <label>priority: 
-      <select name="priority">
-        <option>low</option>
-        <option>medium</option>
-        <option>high</option>
-      </select>
-    </label><br>
-    <button type="submit">新增任務</button>
-  </form>
-  <pre id="postResult" style="background:#f5f5f5; padding:8px;"></pre>
-
-  <hr>
-  <h2>GET /api/tasks</h2>
-  <button id="btnLoad">載入所有任務</button>
-  <pre id="getResult" style="background:#f5f5f5; padding:8px;"></pre>
-
-  <script>
-  const postResult = document.getElementById('postResult');
-  const getResult = document.getElementById('getResult');
-
-  document.getElementById('taskForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const payload = {
-      title: fd.get('title'),
-      description: fd.get('description'),
-      priority: fd.get('priority') || 'low'
-    };
-    try {
-      const r = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      const data = await r.json().catch(()=>({raw: '非 JSON 回應'}));
-      postResult.textContent = JSON.stringify(data, null, 2);
-    } catch (err) {
-      postResult.textContent = String(err);
-    }
-  });
-
-  document.getElementById('btnLoad').addEventListener('click', async () => {
-    try {
-      const r = await fetch('/api/tasks');
-      const data = await r.json().catch(()=>({raw: '非 JSON 回應'}));
-      getResult.textContent = JSON.stringify(data, null, 2);
-    } catch (err) {
-      getResult.textContent = String(err);
-    }
-  });
-  </script>
-</body>
-</html>
-""", 200, {"Content-Type": "text/html; charset=utf-8"}
-
-
-def run_flask():
-    app.run(debug=False, port=5000, host='0.0.0.0')  # Security risk!
+        print(f"❌ 未知的模式: {mode}")
+        show_help()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    connect_db()
-    
-    # 根據命令列參數決定執行什麼
-    import sys
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "gui":
-            gui = TaskGUI()
-            gui.run()
-        elif sys.argv[1] == "api":
-            run_flask()
-
-    else:
-        print("Usage: python main.py [gui|api]")
+    main()
