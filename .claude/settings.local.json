@@ -11,7 +11,8 @@
       "Bash(git config:*)",
       "Bash(git rm:*)",
       "Bash(git push:*)",
-      "Bash(git stash pop)"
+      "Bash(git stash pop)",
+      "SlashCommand(/pack-zh:*)"
     ],
     "deny": [],
     "ask": []
