@@ -1,7 +1,7 @@
 [project]
 name = "f5757-ch09"
 version = "0.1.0"
-description = "Add your description here"
+description = "此分支內容展示自定義指令及使用 auto-fix 指令重整專案後的內容"
 readme = "README.md"
 requires-python = ">=3.11.8"
 dependencies = [
