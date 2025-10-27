@@ -1,6 +1,6 @@
 ---
 allowed-tools: Bash(git add:*), Bash(git commit:*), Bash(git diff:*)
-argument-hint: [要新增的檔案] 或使用 "." 代表所有檔案
+argument-hint: <[要新增的檔案] 或使用 "." 代表所有檔案>
 description: 基礎提交流程自動化
 ---
 

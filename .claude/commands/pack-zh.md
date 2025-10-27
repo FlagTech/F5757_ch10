@@ -1,6 +1,6 @@
 ---
 allowed-tools: Bash(git branch:*), Bash(git checkout:*), Bash(git add:*), Bash(git status:*), Bash(git commit:*), Bash(git log:*), Bash(git diff:*)
-argument-hint: [要新增的檔案] 或使用 "." 代表所有檔案
+argument-hint: <[要新增的檔案] 或使用 "." 代表所有檔案>
 description: 互動式Git工作流程與分支管理
 ---
 

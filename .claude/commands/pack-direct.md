@@ -1,4 +1,5 @@
 ---
+allowed-tools: Bash(git add:*), Bash(git commit:*), Bash(git diff:*)
 description: 強制指令執行提交
 ---
 
