@@ -12,19 +12,12 @@ TaskMaster 是一個任務管理應用程式，包含：
 - Flask API 伺服器
 - SQLite 資料庫儲存
 
-## 開發環境設定
-
-### 啟動虛擬環境
-```bash
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
-```
-
 ### 安裝相依套件
 ```bash
+# 使用 uv 安裝套件
+uv sync
+
+# 或使用 pip
 pip install -r requirements.txt
 ```
 
@@ -33,24 +26,16 @@ pip install -r requirements.txt
 ### 執行應用程式
 ```bash
 # 執行 GUI 介面
-python main.py gui
+uv run python main.py gui
 
 # 執行 API 伺服器 (port 5000)
-python main.py api
+uv run python main.py api
 
 # 執行備份
-python main.py backup
+uv run python main.py backup
 
 # 執行獨立 API 伺服器 (port 8080)
-python api_server.py
-```
-
-### 測試
-```bash
-# 執行單元測試
-python -m pytest test.py
-# 或
-python test.py
+uv run python api_server.py
 ```
 
 ### 資料庫操作
