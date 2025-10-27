@@ -6,6 +6,7 @@ TaskMaster Web 應用模組
 from flask import Flask, request, jsonify, render_template, redirect, url_for, flash
 import sqlite3
 import datetime
+from utils import DateUtils
 
 app = Flask(__name__)
 app.secret_key = 'taskmaster_secret_key'
@@ -67,7 +68,7 @@ def create_task():
     conn = get_db()
     conn.execute(
         "INSERT INTO tasks (title, description, priority, status, created_at) VALUES (?, ?, ?, ?, ?)",
-        (title, description, priority, 'pending', str(datetime.datetime.now()))
+        (title, description, priority, 'pending', DateUtils.get_current_timestamp())
     )
     conn.commit()
     conn.close()
