@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 from typing import List, Tuple, Optional
+from utils import DateUtils
 
 class Task:
     def __init__(self, title: str, description: str = "", priority: str = "low"):
@@ -41,7 +42,7 @@ class DatabaseManager:
                 conn.execute("""
                     INSERT INTO tasks (title, description, priority, status, created_at)
                     VALUES (?, ?, ?, ?, ?)
-                """, (title, description, priority, "pending", str(datetime.datetime.now())))
+                """, (title, description, priority, "pending", DateUtils.get_current_timestamp()))
                 conn.commit()
                 return True
         except Exception as e:
