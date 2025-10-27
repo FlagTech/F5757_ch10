@@ -36,6 +36,7 @@ F5757_ch09/
 └── .claude/          # 🤖 Claude Code 自定義指令
     ├── commands/     # 📂 自定義指令存放位置
     │   ├── auto-fix.md      # 自動修復流程指令
+    │   ├── commit-rules.md  # 提交訊息規範
     │   ├── pack-zh.md       # 中文互動式提交指令
     │   ├── pack-basic.md    # 基礎提交流程指令
     │   └── pack-direct.md   # 強制指令執行指令
