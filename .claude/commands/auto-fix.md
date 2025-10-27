@@ -4,9 +4,6 @@ argument-hint: <功能名稱或任務描述，例如：登入表單驗證>
 description: 規劃→實作→逐步提交的工作流（一次一個功能，提交訊息標準化）
 ---
 
-# 共用流程
-@.claude/commands/pack-zh.md
-
 # 規劃階段（先不要改碼，使用 plan mode）
 在開始規劃前，請先檢查當前目錄是否存在 PROGRESS.md。
 
