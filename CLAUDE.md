@@ -38,7 +38,7 @@ uv run python api_server.py
 ### 資料庫操作
 ```bash
 # 檢查資料庫
-python check_db.py
+uv run python check_db.py
 ```
 
 ## 程式碼架構
