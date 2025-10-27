@@ -10,8 +10,8 @@ description: 互動式Git工作流程與分支管理
 @.claude/commands/commit-rules.md
 
 **第一步：檢查當前分支**
-- 顯示目前所在分支：`git branch --show-current`
-- 顯示所有分支：`git branch -a`
+- 顯示目前所在分支
+- 顯示所有分支
 
 **第二步：確認分支**
 詢問我：「您確定要在目前分支 [分支名稱] 上新增檔案嗎？」
