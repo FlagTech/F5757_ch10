@@ -31,9 +31,6 @@ uv run python main.py gui
 # 執行 API 伺服器 (port 5000)
 uv run python main.py api
 
-# 執行備份
-uv run python main.py backup
-
 # 執行獨立 API 伺服器 (port 8080)
 uv run python api_server.py
 ```
