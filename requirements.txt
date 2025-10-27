@@ -1,0 +1,12 @@
+# TaskMaster 核心依賴套件
+# Web 介面所需
+Flask==3.0.3
+
+# GUI 介面所需 (通常內建)
+# tkinter  # 內建模組，不需要在 requirements.txt 中列出
+
+# 工具和開發所需
+requests>=2.32.5
+
+# 資料庫 (SQLite 是內建的，不需要額外安裝)
+# sqlite3  # 內建模組
