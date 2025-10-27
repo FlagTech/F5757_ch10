@@ -75,21 +75,18 @@ pip install -r requirements.txt
 
 ```bash
 # 🖥️ 啟動桌面 GUI 介面
-python main.py gui
+uv run python main.py gui
 
 # 🌐 啟動 Web API 服務（瀏覽器訪問 http://127.0.0.1:5000）
-python main.py api
+uv run python main.py api
 # 或
-python main.py web
-
-# 💾 執行資料庫備份
-python main.py backup
+uv run python main.py web
 
 # 🔍 檢查資料庫狀態
-python main.py check
+uv run python main.py check
 
 # ❓ 顯示完整說明
-python main.py help
+uv run python main.py help
 ```
 
 ---
@@ -116,7 +113,7 @@ python main.py help
 ### 使用範例
 ```bash
 # 在 Claude Code 中使用
-/auto-fix 修復登入表單驗證
+/auto-fix 修改README文件內容
 /pack-zh .
 ```
 
