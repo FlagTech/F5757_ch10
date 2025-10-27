@@ -14,20 +14,17 @@
 如果你 Fork 了這個專案並想使用 GitHub 上的 Claude Code Workflow，**必須先完成以下設定**：
 
 1. **安裝 Claude GitHub App**
-   - 前往 [Claude GitHub App](https://github.com/apps/claude-code) 安裝頁面
-   - 將 Claude Code 應用程式安裝到你的 GitHub 帳號
-   - 授權存取你 Fork 的專案
+   - 請參照第 10 章安裝步驟
 
 2. **為什麼需要安裝？**
    - 本專案的 Workflow 使用 Claude Code 進行自動化任務
    - 沒有安裝 Claude GitHub App，Workflow 將無法呼叫 Claude Code
-   - 無法執行 `/auto-fix-step` 等自定義指令
 
 3. **安裝後即可使用**
    - GitHub Actions 中的 Claude Code Workflow 將正常運作
    - 可以透過 Workflow 執行程式碼修改、測試等任務
 
-> 💡 **提示**：詳細安裝步驟請參考文末的「相關連結」章節
+> 💡 **提示**：詳細安裝步驟請參考書中第 10 章內容
 
 ---
 
@@ -64,7 +61,7 @@
 
 ## 📋 功能特色
 
-- 桌面 GUI 介面 (Tkinter)
+- 桌面 GUI 介面 (CustomTkinter)
 - Web API 服務 (Flask)
 - SQLite 資料庫
 - 任務管理 (新增、檢視、刪除)
@@ -136,7 +133,7 @@ uv run python main.py help
 ## 🏗️ 專案架構
 
 ```
-F5757_ch09/
+F5757_ch10/
 ├── main.py          # 程式入口點
 ├── database.py      # 資料庫管理
 ├── task_gui.py      # GUI 介面
