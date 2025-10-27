@@ -6,9 +6,6 @@ description: 互動式Git工作流程與分支管理
 
 請協助我執行互動式Git工作流程：
 
-# 共用流程
-@.claude/commands/commit-rules.md
-
 **第一步：檢查當前分支**
 - 顯示目前所在分支
 - 顯示所有分支
